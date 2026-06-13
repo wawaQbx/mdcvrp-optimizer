@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Virtual environment
+.venv/
+venv/
+
+# IDE / editor
+.idea/
+.claude/
+
+# Generated outputs (regenerate via solver.py / visualizer.py)
+output_plots/
+output_plots.zip
+results/*.csv
+!results/benchmark_results.csv
+!results/benchmark_summary.csv
+
+# OS junk
+.DS_Store
+Thumbs.db

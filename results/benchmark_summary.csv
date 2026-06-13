@@ -1,0 +1,11 @@
+Metric,Value
+Instances benchmarked,200
+OR-Tools solved,200/200
+Total Greedy distance,"8,237,348"
+Total OR-Tools distance,"7,134,225"
+Aggregate distance saved,"1,103,123"
+OVERALL OPTIMISATION RATE,+13.39%
+Mean per-instance improvement,+14.04%
+OR-Tools beat baseline on,186/200 instances
+Total vehicles saved,+123
+Average vehicles saved,+0.61
