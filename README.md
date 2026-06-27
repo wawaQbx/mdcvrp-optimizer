@@ -1,113 +1,103 @@
-# 🚚 MDCVRP: Large-Scale Fleet Routing & Cost Optimization Engine
+# MDCVRP: Multi-Depot Fleet Routing Optimization Engine
 
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)
 ![OR-Tools](https://img.shields.io/badge/Google_OR--Tools-Optimization-orange.svg)
 ![Pandas](https://img.shields.io/badge/Pandas-Data_Analysis-green.svg)
 ![Seaborn](https://img.shields.io/badge/Seaborn-Visualization-teal.svg)
 
-## 📖 Project Overview
-This repository contains an end-to-end, production-ready optimization engine for the **Multi-Depot Capacitated Vehicle Routing Problem (MDCVRP)**. Evaluated against 200 high-complexity supply chain instances from the INCOM 2024 and MIM 2025 global challenges [^1], this engine systematically breaks the local-optima traps of traditional heuristic scheduling.
+## Overview
 
-By integrating dynamic multi-depot modeling and **Guided Local Search (GLS)** metaheuristics via Google OR-Tools, the system achieves a **100% feasible solution rate** under strict 30-second computation limits per instance, delivering massive ROI for large-scale logistics networks.
+An end-to-end optimization engine for the Multi-Depot Capacitated Vehicle Routing Problem (MDCVRP), benchmarked against 200 instances from the INCOM 2024 and MIM 2025 supply chain challenge sets.
+
+The solver integrates dynamic multi-depot modeling with Guided Local Search (GLS) metaheuristics via Google OR-Tools, achieving a 100% feasible solution rate under 30-second per-instance computation limits.
 
 ---
 
-## 📊 Core Business Impact & Benchmark Analytics
+## Results
 
-My dual-year pressure test across 200 instances yielded the following quantified improvements over the traditional Nearest-Neighbor Greedy Baseline:
+Evaluated against a Nearest-Neighbor Greedy baseline across all 200 instances:
 
-* **📉 Mileage Reduction:** Slashed global fleet distance by **13.39%** (saving over 1.1 million kilometers of operational transit) [^2].
-* **🚛 Fleet Downsizing:** Eliminated the need for **123 active trucks** across the network, significantly reducing fixed asset depreciation and driver overhead [^3].
-* **🏆 Algorithmic Dominance:** Outperformed the baseline heuristics in **93% (186/200)** of the complex routing scenarios [^4].
+- 13.39% reduction in total fleet distance (1.1M+ km saved)
+- 123 fewer active vehicles required across the network
+- Outperformed baseline in 93% of instances (186/200)
 
-### Comprehensive Analytics Dashboard
-*(This 3x2 BI dashboard is generated directly from the benchmark pipeline outputs)* [^5]
 ![Benchmark Dashboard](results/plots/comprehensive_benchmark_dashboard.png)
-
-> Note: `visualizer.py` reads `benchmark_results.csv` from the current working directory by default. Run it from inside `results/`, or adjust the file path in the script to point at `results/benchmark_results.csv`.
-
----
-
-## 🏗️ System Architecture
-
-The project is decoupled into three robust engineering layers:
-
-1. **`data_loader.py`**: A high-performance data ingestion pipeline. It parses heterogeneous `.vrp` geometries and `.yaml` metadata, utilizing NumPy to compute exact Euclidean distance matrices efficiently.
-2. **`solver.py`**: The core routing brain. It sets up unary/transit callbacks, capacity dimensions, and multi-depot index mappings, unleashing the OR-Tools constraint solver to hunt for the global optimum within a strict time budget. Features an asynchronous plotting engine (`ThreadPoolExecutor`) and Windows file-lock protections (`_safe_to_csv`).
-3. **`visualizer.py`**: A dedicated business intelligence script that translates raw CSV benchmarks into publication-ready Seaborn/Matplotlib visual analytics.
+*3x2 benchmark dashboard generated directly from pipeline outputs via `visualizer.py`*
 
 ---
 
-## 🚀 How to Run (Reproducibility)
+## Architecture
 
-### 1. Install Dependencies
+Three decoupled modules:
+
+- **`data_loader.py`** — parses heterogeneous `.vrp` and `.yaml` instance files; computes Euclidean distance matrices via NumPy
+- **`solver.py`** — configures OR-Tools constraint solver with capacity dimensions and multi-depot index mappings; runs GLS optimization within a strict time budget; writes results to CSV asynchronously via `ThreadPoolExecutor`
+- **`visualizer.py`** — reads `benchmark_results.csv` and generates Seaborn/Matplotlib dashboards and per-summary charts
+
+---
+
+## Usage
+
+### 1. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run the Benchmark Solver
+### 2. Run the solver
 ```bash
 python solver.py
 ```
-This processes all instances in `data/`, runs the OR-Tools GLS solver against the Greedy baseline, and writes:
+Outputs:
+- `results/benchmark_results.csv` — per-instance results
+- `results/benchmark_summary.csv` — aggregated statistics
+- `output_plots/` — per-instance route visualization (200 PNG files)
 
-- `results/benchmark_results.csv` — per-instance results (distances, improvement, vehicles saved)
-- `results/benchmark_summary.csv` — aggregated summary statistics
-- `output_plots/` — a per-instance route visualization for every one of the 200 problem instances (200 PNG files)
+> Note: `output_plots/` is not committed to keep the repository lightweight. Run `solver.py` locally to regenerate, or download the pre-packaged archive (~70 MB) from [Releases](../../releases).
 
-> ⚠️ `output_plots/` contains 200 images and is **not included** in this repository to keep it lightweight. Run `solver.py` locally to regenerate it, or see [Pre-generated Plots](#-pre-generated-plots-optional) below for a downloadable archive.
-
-### 3. Generate Visualizations
+### 3. Generate visualizations
 ```bash
 python visualizer.py
 ```
-Reads `results/benchmark_results.csv` and outputs the comprehensive dashboard plus 6 individual high-resolution summary charts to `results/plots/`.
+Reads `results/benchmark_results.csv` and outputs the dashboard and 6 summary charts to `results/plots/`.
+
+> Note: `visualizer.py` reads from the current working directory by default. Run from inside `results/`, or adjust the file path to point at `results/benchmark_results.csv`.
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
+
 ```
 .
-├── data/                   # MDCVRP instance files (.vrp + .yaml), INCOM2024 / MIM2025 sets
+├── data/                   # MDCVRP instance files (.vrp + .yaml)
 ├── data_loader.py
 ├── solver.py
 ├── visualizer.py
 ├── results/
 │   ├── benchmark_results.csv
 │   ├── benchmark_summary.csv
-│   └── plots/              # summary dashboard + 6 high-res charts (committed)
-├── output_plots/           # per-instance route plots (200 PNGs, generated locally, not committed)
+│   └── plots/
+├── output_plots/           # per-instance route plots (generated locally, not committed)
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 🖼️ Pre-generated Plots (Optional)
+## Dataset
 
-The 200 per-instance route plots in `output_plots/` are generated automatically by `solver.py` but are excluded from version control due to size. A pre-packaged archive (`output_plots.zip`, ~70 MB) is available as a [GitHub Release asset](../../releases) attached to this repository — download and unzip it into `output_plots/` if you'd rather not regenerate the plots locally.
-
----
-
-## 📦 Dataset
-
-The MDCVRP instances used in this benchmark (INCOM 2024 / MIM 2025 SimMD sets) are derived from the **Supply Chain Disruption Monitoring Dataset** [^6].
+Instances are drawn from the INCOM 2024 and MIM 2025 SimMD challenge sets, derived from the Supply Chain Disruption Monitoring Dataset [^1].
 
 ---
 
-## 📄 License
-This project is released under the MIT License. See `LICENSE` for details.
+## License
+
+MIT
 
 ---
 
-## 📑 References
+## References
 
-[^1]: INCOM 2024 and MIM 2025 global challenge instance sets (200 MDCVRP instances).
-[^2]: Aggregate distance reduction computed across all 200 instances; see `benchmark_summary.csv`.
-[^3]: Fleet size reduction computed from the `veh_saved` column in `benchmark_results.csv`.
-[^4]: 186 of 200 instances showed positive `improvement` over the Greedy baseline.
-[^5]: Dashboard generated by `visualizer.py` from `benchmark_results.csv`.
-[^6]: Almahri, S., Xu, L., & Brintrup, A. (2026). *Supply Chain Disruption Monitoring Dataset*. https://github.com/sara-almahri/supply-chain-disruption-monitoring
+[^1]: Almahri, S., Xu, L., & Brintrup, A. (2026). *Supply Chain Disruption Monitoring Dataset*. https://github.com/sara-almahri/supply-chain-disruption-monitoring
 
 ```bibtex
 @misc{almahri2026disruption,
